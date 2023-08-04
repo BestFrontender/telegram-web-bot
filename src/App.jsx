@@ -3,7 +3,7 @@ import {getData} from './constants/db.js'
 import './App.css'
 import Card from "./components/Card/index.js";
 import Cart from "./components/Cart/index.js";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 
 const courses = getData()
 
@@ -44,16 +44,26 @@ const App = () => {
     }
 
     const onCheckout = () => {
-        telegram.MainButton.text = 'Sotib olish: '
+        telegram.MainButton.text = 'Sotib olish :)'
         //telegram MainButtonga text berish
         telegram.MainButton.show()
         //telegram MainButton ni ko'rsat
     }
 
+    const onSendData = useCallback(() => {
+        telegram.sendData(JSON.stringify(cartItems))
+    }, [cartItems])
+
     useEffect(() => {
         telegram.ready()
         // telegram ishlashga tayyorligini tekshirish ready
     })
+
+    useEffect(() => {
+        telegram.onEvent('mainButtonClicked', onSendData)
+
+        return () => telegram.offEvent('mainButtonClicked', onSendData)
+    }, [onSendData])
 
     return (
         <>
